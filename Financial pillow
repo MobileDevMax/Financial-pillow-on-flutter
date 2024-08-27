@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(FinancialPillowApp());
+}
+
+class FinancialPillowApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Financial pillow',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: FinancialPillowHome(),
+    );
+  }
+}
+
+class FinancialPillowHome extends StatefulWidget {
+  @override
+  _FinancialPillowHomeState createState() => _FinancialPillowHomeState();
+}
+
+class _FinancialPillowHomeState extends State<FinancialPillowHome> {
+  final List<double> _savings = [];
+  final TextEditingController _controller = TextEditingController();
+
+  void _addSavings() {
+    final double? value = double.tryParse(_controller.text);
+    if (value != null) {
+      setState(() {
+        _savings.add(value);
+      });
+      _controller.clear();
+    }
+  }
+
+  void _removeSavings(int index) {
+    setState(() {
+      _savings.removeAt(index);
+    });
+  }
+
+  double get totalSavings => _savings.fold(0, (sum, item) => sum + item);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Financial pillow'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Add savings',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: _addSavings,
+                ),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 20),
+            Text('Common savings: \$${totalSavings.toStringAsFixed(2)}', 
+                style: TextStyle(fontSize: 20)),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _savings.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text('\$${_savings[index].toStringAsFixed(2)}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _removeSavings(index),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
